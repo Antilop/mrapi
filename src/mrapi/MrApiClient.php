@@ -3,19 +3,20 @@
 namespace Antilop\MrApi;
 
 use \nusoap_client;
+use Psr\Log\LoggerAwareTrait;
 /**
  * 
  */
-class MrApiClient
+class MrApiClient use LoggerAwareTrait
 {
-	public $params_client = array();
-	protected $_client;
-	protected $web_site_id = '';
-	protected $web_site_key = '';
+	public static $params_client = array();
+	protected static $_client;
+	protected static $web_site_id = '';
+	protected static $web_site_key = '';
 	protected static $security_exclude = array(
 		'Texte'
 	);
-	private $text_error_msg = array(
+	protected static $text_error_msg = array(
 		'1' => 'Enseigne invalide',
 		'2' => 'Numéro d\'enseigne vide ou inexistant',
 		'3' => 'Numéro de compte enseigne invalide',
@@ -150,6 +151,10 @@ class MrApiClient
 			'http://api.mondialrelay.com/',
 			'http://api.mondialrelay.com/'.$method_name
 		);
+		
+		if ($this->logger) {
+			$this->logger->notice('We sent something');
+		}
 		
 		$check_error = $this->checkErrorCall();
 		if ($check_error != '') {
