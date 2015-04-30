@@ -19,108 +19,7 @@ class MrApiClient
 	protected static $security_exclude = array(
 		'Texte'
 	);
-	protected static $text_error_msg = array(
-		'1' => 'Enseigne invalide',
-		'2' => 'Numéro d\'enseigne vide ou inexistant',
-		'3' => 'Numéro de compte enseigne invalide',
-		'4' => '',
-		'5' => 'Numéro de dossier enseigne invalide',
-		'6' => '',
-		'7' => 'Numéro de client enseigne invalide',
-		'8' => 'Mot de passe ou hachage invalide',
-		'9' => 'Ville non reconnu ou non unique',
-		'10' => 'Type de collecte invalide',
-		'11' => 'Numéro de Relais de Collecte invalide',
-		'12' => 'Pays de Relais de collecte invalide',
-		'13' => 'Type de livraison invalide',
-		'14' => 'Numéro de Relais de livraison invalide',
-		'15' => 'Pays de Relais de livraison invalide',
-		'16' => '',
-		'17' => '',
-		'18' => '',
-		'19' => '',
-		'20' => 'Poids du colis invalide',
-		'21' => 'Taille (Longueur + Hauteur) du colis invalide',
-		'22' => 'Taille du Colis invalide',
-		'23' => '',
-		'24' => 'Numéro d\'expédition ou de suivi invalide',
-		'25' => '',
-		'26' => 'Temps de montage invalide',
-		'27' => 'Mode de collecte ou de livraison invalide',
-		'28' => 'Mode de collecte invalide',
-		'29' => 'Mode de livraison invalide',
-		'30' => 'Adresse (L1) invalide',
-		'31' => 'Adresse (L2) invalide',
-		'32' => '',
-		'33' => 'Adresse (L3) invalide',
-		'34' => 'Adresse (L4) invalide',
-		'35' => 'Ville invalide',
-		'36' => 'Code postal invalide',
-		'37' => 'Pays invalide',
-		'38' => 'Numéro de téléphone invalide',
-		'39' => 'Adresse e-mail invalide',
-		'40' => 'Paramètres manquants',
-		'41' => '',
-		'42' => 'Montant CRT invalide',
-		'43' => 'Devise CRT invalide',
-		'44' => 'Valeur du colis invalide',
-		'45' => 'Devise de la valeur du colis invalide',
-		'46' => 'Plage de numéro d\'expédition épuisée',
-		'47' => 'Nombre de colis invalide',
-		'48' => 'Multi-Colis Relais Interdit',
-		'49' => 'Action invalide',
-		'50' => '',
-		'51' => '',
-		'52' => '',
-		'53' => '',
-		'54' => '',
-		'55' => '',
-		'56' => '',
-		'57' => '',
-		'58' => '',
-		'59' => '',
-		'60' => 'Champ texte libre invalide (Ce code erreur n\'est pas invalidant)',
-		'61' => 'Top avisage invalide',
-		'62' => 'Instruction de livraison invalide',
-		'63' => 'Assurance invalide',
-		'64' => 'Temps de montage invalide',
-		'65' => 'Top rendez-vous invalide',
-		'66' => 'Top reprise invalide',
-		'67' => 'Latitude invalide',
-		'68' => 'Longitude invalide',
-		'69' => 'Code Enseigne invalide',
-		'70' => 'Numéro de Point Relais invalide',
-		'71' => 'Nature de point de vente non valide',
-		'72' => '',
-		'73' => '',
-		'74' => 'Langue invalide',
-		'75' => '',
-		'76' => '',
-		'77' => '',
-		'78' => 'Pays de Collecte invalide',
-		'79' => 'Pays de Livraison invalide',
-		'80' => 'Code tracing : Colis enregistré',
-		'81' => 'Code tracing : Colis en traitement chez Mondial Relay',
-		'82' => 'Code tracing : Colis livré',
-		'83' => 'Code tracing : Anomalie',
-		'84' => '(Réservé Code Tracing)',
-		'85' => '(Réservé Code Tracing)',
-		'86' => '(Réservé Code Tracing)',
-		'87' => '(Réservé Code Tracing)',
-		'88' => '(Réservé Code Tracing)',
-		'89' => '(Réservé Code Tracing)',
-		'90' => '',
-		'91' => '',
-		'92' => '',
-		'93' => 'Aucun élément retourné par le plan de tri',
-		'94' => 'Colis Inexistant',
-		'95' => 'Compte Enseigne non activé',
-		'96' => 'Type d\'enseigne incorrect en Base',
-		'97' => 'Clé de sécurité invalide',
-		'98' => 'Erreur générique (Paramètres invalides)',
-		'99' => 'Erreur générique du service',
-	);
-	
+
 	public function __construct($site_id, $site_key) {
 		date_default_timezone_set('Europe/Paris');
 		$client = new nusoap_client("http://api.mondialrelay.com/Web_Services.asmx?WSDL", true);
@@ -148,7 +47,7 @@ class MrApiClient
 	
 	protected function callMethod($method_name)
 	{
-		$response_service = $this->_client->call(
+		$response = $this->_client->call(
 			$method_name,
 			$this->params_client,
 			'http://api.mondialrelay.com/',
@@ -156,18 +55,28 @@ class MrApiClient
 		);
 		
 		if ($this->logger) {
-			$this->logger->notice('We sent something');
+			$call_message = array_merge(array('callMethod' => $method_name), $this->params_client);
+			$call_message = serialize($call_message);
+			$code_status = array();
+			if (isset($response[$method_name.'Result']['STAT'])) {
+				$code_status = array('code_status' => $response[$method_name.'Result']['STAT']);
+			}
+			$this->logger->notice($call_message, $code_status);
 		}
 		
-		$check_error = $this->checkErrorCall();
+		$check_error = $this->checkError();
 		if ($check_error != '') {
+			if ($this->logger) {
+				$call_message = $rc;
+				$this->logger->error($call_message);
+			}
 			return $check_error;
 		}
 		
-		return $response_service[$method_name.'Result'];
+		return $response[$method_name.'Result'];
 	}
 	
-	protected function checkErrorCall()
+	protected function checkError()
 	{
 		$rc = '';
 		if ($this->_client->fault) {
@@ -182,25 +91,32 @@ class MrApiClient
 		return $rc;
 	}
 	
-	protected function msgErrorResponseService($code)
+	protected function getErrorMsg($code_error)
 	{
-		return $this->text_error_msg[$code];
+		$params = array(
+			'STAT_ID' => $code_error,
+			'Langue' => 'FR',
+		);
+		$this->setParamsClient($params);
+		$response = $this->callMethod('WSI2_STAT_Label');
+		
+		return array('error'=>$response);
 	}
 	
 	public function getPointRelais($params)
 	{
 		$this->setParamsClient($params);
-		$response_service = $this->callMethod('WSI3_PointRelais_Recherche');
+		$response = $this->callMethod('WSI3_PointRelais_Recherche');
 		
-		if (is_array($response_service)) {
-			$code_stat = $response_service['STAT'];
+		if (is_array($response)) {
+			$code_stat = $response['STAT'];
 			if ($code_stat === '0') {
-				$result = $response_service['PointsRelais'];
+				$result = $response['PointsRelais'];
 			} else {
-				$result = array('error' => $this->msgErrorResponseService($code_stat));
+				$result = $this->getErrorMsg($code_stat);
 			}
 		} else {
-			$result = array('error' => $response_service);
+			$result = array('error' => $response);
 		}
 		
 		return $result;
@@ -209,18 +125,18 @@ class MrApiClient
 	public function getEtiquette($params)
 	{
 		$this->setParamsClient($params);
-		$response_service = $this->callMethod('WSI2_CreationEtiquette');
+		$response = $this->callMethod('WSI2_CreationEtiquette');
 		
-		if (is_array($response_service)) {
-			$code_stat = $response_service['STAT'];
+		if (is_array($response)) {
+			$code_stat = $response['STAT'];
 			if ($code_stat === '0') {
-				$result['ExpeditionNum'] = $response_service['ExpeditionNum'];
-				$result['URL_Etiquette'] = str_replace('/ww2', 'http://www.mondialrelay.com', $response_service['URL_Etiquette']);
+				$result['ExpeditionNum'] = $response['ExpeditionNum'];
+				$result['URL_Etiquette'] = str_replace('/ww2', 'http://www.mondialrelay.com', $response['URL_Etiquette']);
 			} else {
-				$result = array('error' => $this->msgErrorResponseService($code_stat));
+				$result = $this->getErrorMsg($code_stat);
 			}
 		} else {
-			$result = array('error' => $response_service);
+			$result = array('error' => $response);
 		}
 		
 		return $result;
@@ -229,18 +145,18 @@ class MrApiClient
 	public function getTracingColis($params)
 	{
 		$this->setParamsClient($params);
-		$response_service = $this->callMethod('WSI2_TracingColisDetaille');
+		$response = $this->callMethod('WSI2_TracingColisDetaille');
 		
-		if (is_array($response_service)) {
-			$code_stat = $response_service['STAT'];
-			$libelle = $response_service['Libelle01'];
+		if (is_array($response)) {
+			$code_stat = $response['STAT'];
+			$libelle = $response['Libelle01'];
 			if ($libelle != '') {
-				$result = $response_service;
+				$result = $response;
 			} else {
-				$result = array('error' => $this->msgErrorResponseService($code_stat));
+				$result = $this->getErrorMsg($code_stat);
 			}
 		} else {
-			$result = array('error' => $response_service);
+			$result = array('error' => $response);
 		}
 		
 		return $result;
