@@ -3,12 +3,14 @@
 namespace Antilop\MrApi;
 
 use \nusoap_client;
-use Psr\Log\LoggerAwareTrait;
+
 /**
  * 
  */
-class MrApiClient use LoggerAwareTrait
+class MrApiClient
 {
+	use Psr\Log\LoggerAwareTrait;
+	
 	public static $params_client = array();
 	protected static $_client;
 	protected static $web_site_id = '';
