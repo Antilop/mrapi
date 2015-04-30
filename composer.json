@@ -1,6 +1,6 @@
 {
-    "name": "sebastiencolombo/mrapi",
-    "description": "WebService Mondial Relai",
+    "name": "antilop/mrapi",
+    "description": "WebService Mondial Relay",
     "require": {
         "fergusean/nusoap": "dev-master",
         "psr/log": "dev-master"
@@ -11,5 +11,10 @@
             "email": "sebastien@antilop.fr"
         }
     ],
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0" : {
+            "Antilop\\MrApi" : "src"
+        }
+    }
 }
