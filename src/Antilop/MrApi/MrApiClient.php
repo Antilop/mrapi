@@ -1,15 +1,16 @@
 <?php
 
-namespace MrApi;
+namespace Antilop\MrApi;
 
 use \nusoap_client;
+use \Psr\Log\LoggerAwareTrait;
 
 /**
  * 
  */
 class MrApiClient
 {
-	use Psr\Log\LoggerAwareTrait;
+	use LoggerAwareTrait;
 	
 	public static $params_client = array();
 	protected static $_client;
