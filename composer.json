@@ -1,0 +1,14 @@
+{
+    "name": "sebastiencolombo/mrapi",
+    "description": "WebService Mondial Relai",
+    "require": {
+        "fergusean/nusoap": "dev-master"
+    },
+    "authors": [
+        {
+            "name": "sebastien",
+            "email": "sebastien@antilop.fr"
+        }
+    ],
+    "minimum-stability": "dev"
+}
