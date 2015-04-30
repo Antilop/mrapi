@@ -1,6 +1,6 @@
 <?php
 
-namespace Antilop\MrApi;
+namespace MrApi;
 
 use \nusoap_client;
 
