@@ -67,7 +67,7 @@ class MrApiClient
 		$check_error = $this->checkError();
 		if ($check_error != '') {
 			if ($this->logger) {
-				$call_message = $rc;
+				$call_message = $check_error;
 				$this->logger->error($call_message);
 			}
 			return $check_error;
@@ -122,7 +122,7 @@ class MrApiClient
 		return $result;
 	}
 	
-	public function getEtiquette($params)
+	public function getEtiquette($params, $format = 'A4')
 	{
 		$this->setParamsClient($params);
 		$response = $this->callMethod('WSI2_CreationEtiquette');
@@ -131,7 +131,7 @@ class MrApiClient
 			$code_stat = $response['STAT'];
 			if ($code_stat === '0') {
 				$result['ExpeditionNum'] = $response['ExpeditionNum'];
-				$result['URL_Etiquette'] = str_replace('/ww2', 'http://www.mondialrelay.com', $response['URL_Etiquette']);
+				$result['URL_Etiquette'] = str_replace(array('/ww2','A4'), array('http://www.mondialrelay.com',$format), $response['URL_Etiquette']);
 			} else {
 				$result = $this->getErrorMsg($code_stat);
 			}
