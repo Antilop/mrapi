@@ -131,7 +131,7 @@ class MrApiClient
 			$code_stat = $response['STAT'];
 			if ($code_stat === '0') {
 				$result['ExpeditionNum'] = $response['ExpeditionNum'];
-				$result['URL_Etiquette'] = 'http://www.mondialrelay.com'.str_replace('A4', $format, $response['URL_Etiquette']);
+				$result['URL_Etiquette'] = 'http://www.mondialrelay.com'.str_replace('format=A4', 'format='.$format, $response['URL_Etiquette']);
 			} else {
 				$result = $this->getErrorMsg($code_stat);
 			}
