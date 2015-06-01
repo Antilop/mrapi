@@ -150,7 +150,7 @@ class MrApiClient
 		if (is_array($response)) {
 			$code_stat = $response['STAT'];
 			$libelle = $response['Libelle01'];
-			if ($libelle != '') {
+			if (in_array($code_stat, array('80','81','82'))) {
 				$result = $response;
 			} else {
 				$result = $this->getErrorMsg($code_stat);
