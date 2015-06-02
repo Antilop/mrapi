@@ -19,10 +19,12 @@ class MrApiClient
 	protected static $security_exclude = array(
 		'Texte'
 	);
+	protected static  $url_ws;
 
-	public function __construct($site_id, $site_key) {
+	public function __construct($url_ws, $site_id, $site_key) {
 		date_default_timezone_set('Europe/Paris');
-		$client = new nusoap_client("http://api.mondialrelay.com/Web_Services.asmx?WSDL", true);
+		$this->url_ws = $url_ws;
+		$client = new nusoap_client($this->url_ws.'Web_Services.asmx?WSDL', true);
 		$client->soap_defencoding = 'utf-8';
 		
 		$this->_client = &$client;
@@ -50,8 +52,8 @@ class MrApiClient
 		$response = $this->_client->call(
 			$method_name,
 			$this->params_client,
-			'http://api.mondialrelay.com/',
-			'http://api.mondialrelay.com/'.$method_name
+			$this->url_ws,
+			$this->url_ws.$method_name
 		);
 		
 		if ($this->logger) {
@@ -122,7 +124,7 @@ class MrApiClient
 		return $result;
 	}
 	
-	public function getEtiquette($params, $format = 'A4')
+	public function getEtiquette($params)
 	{
 		$this->setParamsClient($params);
 		$response = $this->callMethod('WSI2_CreationEtiquette');
@@ -131,7 +133,9 @@ class MrApiClient
 			$code_stat = $response['STAT'];
 			if ($code_stat === '0') {
 				$result['ExpeditionNum'] = $response['ExpeditionNum'];
-				$result['URL_Etiquette'] = 'http://www.mondialrelay.com'.str_replace('format=A4', 'format='.$format, $response['URL_Etiquette']);
+				$result['URL_Etiquette_A4'] = 'http://www.mondialrelay.com'.$response['URL_Etiquette'];
+				$result['URL_Etiquette_A5'] = 'http://www.mondialrelay.com'.str_replace('format=A4', 'format=A5', $response['URL_Etiquette']);
+				$result['URL_Etiquette_10x15'] = 'http://www.mondialrelay.com'.str_replace('format=A4', 'format=10x15', $response['URL_Etiquette']);
 			} else {
 				$result = $this->getErrorMsg($code_stat);
 			}
