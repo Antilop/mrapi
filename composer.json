@@ -3,7 +3,7 @@
     "description": "WebService Mondial Relay",
     "require": {
         "fergusean/nusoap": "0.9.*",
-        "psr/log": "dev-master"
+        "psr/log": "1.0.*"
     },
     "authors": [
         {
