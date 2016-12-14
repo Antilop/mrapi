@@ -2,7 +2,7 @@
     "name": "antilop/mrapi",
     "description": "WebService Mondial Relay",
     "require": {
-        "fergusean/nusoap": "dev-master",
+        "fergusean/nusoap": "0.9.*",
         "psr/log": "dev-master"
     },
     "authors": [
